@@ -1,0 +1,35 @@
+Changelog -- AutoClean v3.2
+_________________________________
+
+Improved Overall Stability and Reliability
+
+Fixed an issue where if a step was interrupted you were forced to skip it
+
+Fixed an issue where Eset Online Scanner would re-open after it was finished running
+
+Corrected a display issue that caused text to be pushed off of the screen
+
+Fixed an issue which prevented a hidden Easter Egg from opening and added more
+opportunities to access it.
+
+Labeled source code to make future updates easier
+
+Windows version checking is now fully functional.  The script adjusts according to
+the OS it is running on
+-Created custom cleaning routine for Windows NT
+-Created custom cleaning routine for Windows 2000
+-Created custom cleaning routine for Windows XP
+-Created custom cleaning routine for Windows Server 2003
+-Created custom cleaning routine for Windows Vista
+-Created custom cleaning routine for Windows 7
+-Created custom cleaning routine for Windows Server 2008
+-Created custom cleaning routine for Windows 8
+-Created custom cleaning routine for Windows Server 2012
+-Created custom cleaning routine for Windows 10
+
+*UPDATED VERSION* Eset Online Scanner
+*UPDATED VERSION* ADW Cleaner
+*UPDATED VERSION* Combofix (this is for XP through 7)
+*UPDATED VERSION* Revo Uninstaller
+*UPDATED VERSION* CCleaner
+
