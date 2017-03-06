@@ -1,0 +1,68 @@
+Changelog -- AutoClean v3.3 -- 3/5/2017
+_________________________________
+
+Added System Information and Other Options menu accessible at startup by pressing
+the (i) key. (Will be referred to as 'Options' menu hereafter)
+
+  -Added the ability to display onscreen and save the systems Microsoft product keys
+   to the desktop in keyinfo.txt - This is supported by all versions of Windows
+   (10/2012/8/2008/7/VISTA/2003/XP/2000/NT)
+  -Added Full System Backup to the Options menu, this includes Microsoft Product Keys
+   (Windows/Office), Full Registry Backup, Full User Folder backup (All Personal Data
+   including AppData) This function will backup to network locations if needed
+   You may need to authenticate with the destination first for this feature to work
+  -Added ability to change the step you are currently on to Options menu. Once selected 
+   the program will restart and resume running from the point you've chosen
+  -Added ability to reset and exit AutoClean in options menu (This prevents AutoClean
+   from automatically starting with the computer, and resets AutoClean settings back
+   to default)
+
+Fixed an issue where the Hard Drive test window would close before results could be 
+viewed. This is a problem if you are not watching in real time you will miss the results.
+There is now a log file created for Health and Errors and they are displayed in case you
+missed the realtime GUI scan
+
+Changed AutoClean and AutoClean Setup icons
+
+*UPDATED VERSION* Eset Online Scanner
+*UPDATED VERSION* ADW Cleaner
+*UPDATED VERSION* Combofix (this is for XP through 7)
+*UPDATED VERSION* CCleaner
+
+*Removed Component - reset.exe (Reason: Obsolete)
+
+Changelog -- AutoClean v3.2 -- 8/6/2016
+_________________________________
+
+Improved Overall Stability and Reliability
+
+Fixed an issue where if a step was interrupted you were forced to skip it
+
+Fixed an issue where Eset Online Scanner would re-open after it was finished running
+
+Corrected a display issue that caused text to be pushed off of the screen
+
+Fixed an issue which prevented a hidden Easter Egg (e) from opening and added more
+opportunities to access it.
+
+Labeled source code to make future updates easier
+
+Windows version checking is now fully functional.  The script adjusts according to
+the OS it is running on
+-Created custom cleaning routine for Windows NT
+-Created custom cleaning routine for Windows 2000
+-Created custom cleaning routine for Windows XP
+-Created custom cleaning routine for Windows Server 2003
+-Created custom cleaning routine for Windows Vista
+-Created custom cleaning routine for Windows 7
+-Created custom cleaning routine for Windows Server 2008
+-Created custom cleaning routine for Windows 8
+-Created custom cleaning routine for Windows Server 2012
+-Created custom cleaning routine for Windows 10
+
+*UPDATED VERSION* Eset Online Scanner
+*UPDATED VERSION* ADW Cleaner
+*UPDATED VERSION* Combofix (this is for XP through 7)
+*UPDATED VERSION* Revo Uninstaller
+*UPDATED VERSION* CCleaner
+
