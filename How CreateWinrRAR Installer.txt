@@ -1,0 +1,8 @@
+AutoClean v3.3 SFX Installer Notes
+----------------------------------
+
+Create SFX Archive with WinRAR
+
+Code for SFX Winrar Installer.txt can be copied and pasted into comments section.
+
+An icon is in the ETC\ folder that can be associated 

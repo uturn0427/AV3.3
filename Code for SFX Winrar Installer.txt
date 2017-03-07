@@ -1,0 +1,12 @@
+;The comment below contains SFX script commands
+
+Path=C:\AV3.3\
+SavePath
+Silent=2
+Overwrite=1
+Title=AutoClean 3.3
+Text
+{
+Initializing installation...
+}
+Shortcut=D, AUTOCLEAN.EXE, , "A Technicians Tool", "AutoClean v3.3", ETC\AutoClean.ico

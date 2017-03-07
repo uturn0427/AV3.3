@@ -1,7 +1,39 @@
 @ECHO OFF
 :SETWINDOWSIZE
 mode con: cols=112  lines=48
+:PRIVILEGECHECK
+NET SESSION >nul 2>&1
+IF %errorlevel% == 0 (
+GOTO INITIALIZE
+) else (
+ECHO ---------------------------------------------
+ECHO !! Warning, Elevated Privilege is Required !!
+ECHO.                                       
+ECHO           ''                              
+ECHO       ''kkwwww''              JJJJkk      
+ECHO         kkwwwwZZtt          wwwwwwww      
+ECHO           kkwwwwZZ''      kkwwwwww;;      
+ECHO             wwwwwwww''  kkwwwwZZ;;        
+ECHO               wwwwwwZZwwZZwwww            
+ECHO                 kkwwwwwwwwww''            
+ECHO                   ZZwwwwwwkk              
+ECHO                 wwwwwwwwwwwwww            
+ECHO               kkwwwwwwkkwwwwwwkk          
+ECHO             kkwwwwwwJJ  ;;ZZwwZZww        
+ECHO           wwwwwwkkkk        ZZwwwwww''    
+ECHO         ZZZZwwwwJJ            kkwwwwww    
+ECHO       ttZZwwwwJJ                JJkkkk;;   
+ECHO     ;;  ;;JJ''                    ;;      
+ECHO.                                        
+ECHO          ! RUN AS AN ADMINISTRATOR !
+ECHO         ! THE PROGRAM WILL NOW EXIT !
+ECHO ---------------------------------------------
+ECHO.
+PAUSE
+EXIT
+)
 :INITIALIZE
+CLS
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 REG QUERY HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step"
 IF %errorlevel% == 0 GOTO HAPPYEASTER 
@@ -16,6 +48,7 @@ if %errorlevel% == 2 GOTO OPTIONS
 GOTO VERSIONCHECK
 
 :RUNEGG
+CLS
 C:\AV3.3\ETC\DOSBoxPortable.exe -noconsole
 GOTO VERSIONCHECK
 
@@ -91,6 +124,7 @@ PAUSE
 GOTO INITIALIZE
 
 :GETKEY
+CD\AV3.3
 CLS
 INFO\GetKey.exe /s raw.txt
 FINDSTR /i /c:"Micro" /c:"Comp" /c:"Owne" /c:"PID:" /c:"Key:" INFO\raw.txt >INFO\keyinfo.txt
@@ -109,6 +143,8 @@ ECHO.
 ECHO.
 CHOICE /M "Would you like to save a copy of this information on the Desktop?"
 IF %errorlevel% == 1 COPY INFO\keyinfo.txt %USERPROFILE%\Desktop\
+DEL INFO\keyinfo.txt /Q
+DEL INFO\raw.txt /Q
 IF %errorlevel% == 2 GOTO OPTIONS
 PAUSE
 GOTO INITIALIZE
@@ -3739,6 +3775,7 @@ echo :
 
 :COMPLETE
 CLS
+ECHO Cleaning up...
 REG DELETE HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /va /f
 REG DELETE HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /va /f
 ECHO.
@@ -3749,8 +3786,9 @@ PAUSE
 EXIT
 
 :BACKUP
+CD\AV3.3
 CLS
-ECHO Full System Backup Initializing..
+ECHO System Backup Initializing...
 ECHO.
 ECHO.
 ECHO.
@@ -3759,25 +3797,44 @@ SET ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%
 SET /P "backupdest=Please enter the destination of the backup.......(e.g. d: -- \\rackstation) : "
 SET /P "name=Please Name this Backup.................................(Usually Last Name) : "
 ECHO.
-ECHO.
-ECHO Retrieving and backing up Product Key(s)..
+ECHO Attempting to retrieve and back up Product Key(s)..
 INFO\GetKey.exe /s raw.txt
 FINDSTR /i /c:"Micro" /c:"Comp" /c:"Owne" /c:"PID:" /c:"Key:" INFO\raw.txt >INFO\keyinfo.txt
 XCOPY INFO\keyinfo.txt %backupdest%\%name%-%ldt%\ /C /Y /Z /Q
+DEL INFO\keyinfo.txt /Q
+DEL INFO\raw.txt /Q
 ECHO.
-ECHO Retrieving and Backing up Outlook PST files (from default locations)
+ECHO Attempting to retrieve and back up Outlook PST files (from default locations)
+IF EXIST %userprofile%\AppData\Local\Microsoft\Outlook\*.pst (
+XCOPY %userprofile%\AppData\Local\Microsoft\Outlook\*.pst %backupdest%\%name%-%ldt%\Outlook-PST\ /C /Y /Z /Q
 ECHO.
-IF EXIST %userprofile%\AppData\Local\Microsoft\Outlook XCOPY %userprofile%\AppData\Local\Microsoft\Outlook\*.pst %backupdest%\%name%-%ldt%\Outlook-PST\ /E /C /H /Y /Z
-IF EXIST %userprofile%\Documents\Outloo~1\ XCOPY %userprofile%\Documents\Outloo~1\*.pst %backupdest%\%name%-%ldt%\Outlook-PST\ /E /C /H /Y /Z
+) ELSE (
+GOTO BSTEP2
+)
+:BSTEP2
+IF EXIST %userprofile%\Documents\Outloo~1\*.pst (
+XCOPY %userprofile%\Documents\Outloo~1\*.pst %backupdest%\%name%-%ldt%\Outlook-PST\ /C /Y /Z /Q
 ECHO.
-ECHO Backing up the Registry..
+) ELSE (
+GOTO BSTEP3
+)
+:BSTEP3
+ECHO Attempting to retrieve and back up Quickbooks Data...
+IF EXIST C:\Users\Public\Docume~1\Intuit\QuickB~1\Compan~1\*.* (
+XCOPY C:\Users\Public\Docume~1\Intuit\QuickB~1\Compan~1\*.* %backupdest%\%name%-%ldt%\QuickBooks-Data\ /E /C /Y /Z /Q
+ECHO.
+) ELSE (
+GOTO BSTEP4
+)
+:BSTEP4
+ECHO Attempting to retrieve and back up the Registry..
 REG EXPORT hkey_local_machine\software\microsoft\windows INFO\HKLMregbackup_%ldt%.reg /Y
 REG EXPORT hkey_current_user\software\microsoft\windows INFO\HKCUregbackup_%ldt%.reg /Y
 XCOPY INFO\HKLMregbackup_%ldt%.reg %backupdest%\%name%-%ldt%\ /C /Y /Z /Q
 XCOPY INFO\HKCUregbackup_%ldt%.reg %backupdest%\%name%-%ldt%\ /C /Y /Z /Q
 ECHO.
 ECHO Backing up User Data. This may take a while..
-IF EXIST C:\Users XCOPY C:\Users %backupdest%\%name%-%ldt%\Users\ /E /C /H /Y /Z
+XCOPY "C:\Users\*.*" "%backupdest%\%name%-%ldt%\Users\" /E /C /H /Y /Z 
 ECHO Backup Complete..
 ECHO.
 PAUSE
