@@ -1,5 +1,13 @@
-Changelog -- AutoClean v3.3 -- 3/5/2017
+Changelog -- AutoClean v3.3 -- 3/12/2017
 _________________________________
+
+Improved Overall Performance and Removed Reduntant Code
+
+Fixed issue that caused Eset Online Scanner to crash
+
+Added System Reset notification after certain utilities need to restart should
+they find any threats and need to clean them.  This automated reboot can be
+aborted by pressing the (a) key 
 
 Added System Information and Other Options menu accessible at startup by pressing
 the (i) key. (Will be referred to as 'Options' menu hereafter)
@@ -8,9 +16,9 @@ the (i) key. (Will be referred to as 'Options' menu hereafter)
    to the desktop in keyinfo.txt - This is supported by all versions of Windows
    (10/2012/8/2008/7/VISTA/2003/XP/2000/NT)
   -Added Full System Backup to the Options menu, this includes Microsoft Product Keys
-   (Windows/Office), Full Registry Backup, Full User Folder backup (All Personal Data
-   including AppData) This function will backup to network locations if needed
-   You may need to authenticate with the destination first for this feature to work
+   (Windows/Office), Full Registry Backup, Full User Folder backup (All users data)
+   This function will backup to network locations if needed you will need to authenticate 
+   with the destination first for this feature to work
   -Added ability to change the step you are currently on to Options menu. Once selected 
    the program will restart and resume running from the point you've chosen
   -Added ability to reset and exit AutoClean in options menu (This prevents AutoClean
