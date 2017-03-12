@@ -1,6 +1,11 @@
 @ECHO OFF
+:SYSTEM
+CD\AV3.3
+SET load=
+SET/a loadnum=0
 :SETWINDOWSIZE
-mode con: cols=112  lines=48
+TITLE AutoClean v3.3
+MODE CON: COLS=112  LINES=48
 :PRIVILEGECHECK
 NET SESSION >nul 2>&1
 IF %errorlevel% == 0 (
@@ -40,13 +45,22 @@ IF %errorlevel% == 0 GOTO HAPPYEASTER
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "1" /f
 
 :HAPPYEASTER
+SET load=%load%ллллллллллллл
 CLS
-ECHO Loading please wait...  Press (i) key for System Information and Other Options.
-choice /c eix /t 6 /d x >nul
-if %errorlevel% == 1 GOTO RUNEGG
-if %errorlevel% == 2 GOTO OPTIONS
-GOTO VERSIONCHECK
-
+ECHO ------------------------------------------------------------------------------
+ECHO %load%
+ECHO ------------------------------------------------------------------------------
+ECHO Loading please wait...  Press (i) key for System Information and Other Options
+choice /c eix /t 1 /d x >nul
+IF %errorlevel% == 1 GOTO RUNEGG
+IF %errorlevel% == 2 GOTO OPTIONS
+SET /a loadnum=%loadnum% +1
+IF %loadnum% == 6 (
+SET loadnum=0
+goto VERSIONCHECK
+) else (
+GOTO HAPPYEASTER
+)
 :RUNEGG
 CLS
 C:\AV3.3\ETC\DOSBoxPortable.exe -noconsole
@@ -70,15 +84,15 @@ ECHO ==========================================================
 ECHO Selecting Option 1-9 will tell the program to restart 
 ECHO and resume from that step. 
 ECHO.
-ECHO (1) Check HD
-ECHO (2) Revo     
-ECHO (3) Junk File Cleanup
-ECHO (4) CCleaner
-ECHO (5) SpyBot
-ECHO (6) ADW Cleaner
-ECHO (7) Disk Cleanup [Win 8/8.1/2012/10] - ComboFix [Win 2000/NT/XP/2003/VISTA/7/2008]
-ECHO (8) Malwarebytes
-ECHO (9) Eset Security Scan
+ECHO ^|(1)^| Check HD
+ECHO ^|(2)^| Revo     
+ECHO ^|(3)^| Junk File Cleanup
+ECHO ^|(4)^| CCleaner
+ECHO ^|(5)^| SpyBot
+ECHO ^|(6)^| ADW Cleaner
+ECHO ^|(7)^| Disk Cleanup [Win 8/8.1/2012/10] - ComboFix [Win 2000/NT/XP/2003/VISTA/7/2008]
+ECHO ^|(8)^| Malwarebytes
+ECHO ^|(9)^| Eset Security Scan
 ECHO.
 ECHO ==========================================================
 ECHO.
@@ -101,10 +115,10 @@ IF %errorlevel% == 6 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "
 IF %errorlevel% == 7 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
 IF %errorlevel% == 8 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 IF %errorlevel% == 9 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
-IF %errorlevel% == 10 GOTO COMPLETE
-IF %errorlevel% == 11 GOTO INITIALIZE
-IF %errorlevel% == 12 GOTO GETKEY
-IF %errorlevel% == 13 GOTO BACKUP
+IF %errorlevel% == 10 SET "load=" & SET loadnum=0 & GOTO COMPLETE
+IF %errorlevel% == 11 SET "load=" & SET loadnum=0 & GOTO INITIALIZE
+IF %errorlevel% == 12 SET "load=" & SET loadnum=0 & GOTO GETKEY
+IF %errorlevel% == 13 SET "load=" & SET loadnum=0 & GOTO BACKUP
 ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
@@ -121,10 +135,11 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %option% == 9 ECHO You selected Eset Security Scan, the program will resume at Step 9 of 9
 ECHO.
 PAUSE
+SET load=
+SET loadnum=0
 GOTO INITIALIZE
 
 :GETKEY
-CD\AV3.3
 CLS
 INFO\GetKey.exe /s raw.txt
 FINDSTR /i /c:"Micro" /c:"Comp" /c:"Owne" /c:"PID:" /c:"Key:" INFO\raw.txt >INFO\keyinfo.txt
@@ -153,40 +168,40 @@ GOTO INITIALIZE
 CLS
 ECHO Determining Windows version...
 ver | find "2003" > nul
-if %ERRORLEVEL% == 0 goto ver_2003
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows Server 2003 & goto ver_2003
 
 ver | find "XP" > nul
-if %ERRORLEVEL% == 0 goto ver_xp
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows XP & goto ver_xp
 
 ver | find "2000" > nul
-if %ERRORLEVEL% == 0 goto ver_2000
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows 2000 & goto ver_2000
 
 ver | find "NT" > nul
-if %ERRORLEVEL% == 0 goto ver_nt
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows NT & goto ver_nt
 
 if not exist %SystemRoot%\system32\systeminfo.exe goto warn
 
 FOR /F "delims=: tokens=2" %%i IN ('systeminfo 2^>NUL ^| find "OS Name"') DO set vers=%%i
 
 echo %vers% | find "Windows 10" > nul
-if %ERRORLEVEL% == 0 goto ver_10
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows 10 & goto ver_10
 
 echo %vers% | find "Windows 8" > nul
-if %ERRORLEVEL% == 0 goto ver_8
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows 8 and 8.1 & goto ver_8
 
 echo %vers% | find "Windows 7" > nul
-if %ERRORLEVEL% == 0 goto ver_7
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows 7 & goto ver_7
 
 echo %vers% | find "Windows Server 2008" > nul
-if %ERRORLEVEL% == 0 goto ver_2008
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows Server 2008 & goto ver_2008
 
 echo %vers% | find "Windows Server 2012" > nul
-if %ERRORLEVEL% == 0 goto ver_2012
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows Server 2012 & goto ver_2012
 
 echo %vers% | find "Windows Vista" > nul
-if %ERRORLEVEL% == 0 goto ver_vista
+if %ERRORLEVEL% == 0 SET winvers=AutoClean v3.3 for Windows Vista & goto ver_vista
 
-goto warn
+GOTO WARN
 
 :ver_10
 REM Run Windows 10 specific commands here.
@@ -196,46 +211,12 @@ REM ____________________________________________________________________________
 echo Windows 10 Identified 
 :RUNSTEP10
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows 10
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set staging10=%%B
@@ -253,7 +234,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %staging10% == 11 (GOTO COMPLETE)
 
 :10STEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -277,9 +257,6 @@ PAUSE
 GOTO RUNSTEP10
 
 :10STEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -290,11 +267,6 @@ if errorlevel 1 goto 10loopRE
 GOTO RUNSTEP10
 
 :10STEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -394,19 +366,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :10STEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEP10
 
 :10STEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -422,15 +387,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEP10
 
 :10STEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -448,17 +404,6 @@ if errorlevel 1 goto 10loopSBU
 GOTO RUNSTEP10
 
 :10STEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -467,22 +412,20 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto 10loopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP10
 
 :10STEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Disk Cleanup..........Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
@@ -493,51 +436,19 @@ if errorlevel 1 goto 10loopDC
 GOTO RUNSTEP10
 
 :10STEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Disk Cleanup..........Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe 
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe 
 GOTO RUNSTEP10
 
 :10STEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Disk Cleanup..........Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :10loopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto 10loopES
@@ -553,46 +464,12 @@ REM ____________________________________________________________________________
 echo Windows Server 2012 Identified 
 :RUNSTEP2012
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows Server 2012
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set staging2012=%%B
@@ -610,7 +487,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %staging2012% == 11 (GOTO COMPLETE)
 
 :2012STEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -634,9 +510,6 @@ PAUSE
 GOTO RUNSTEP2012
 
 :2012STEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -647,11 +520,6 @@ if errorlevel 1 goto 2012loopRE
 GOTO RUNSTEP2012
 
 :2012STEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -751,19 +619,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :2012STEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEP2012
 
 :2012STEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -779,15 +640,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEP2012
 
 :2012STEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -805,17 +657,6 @@ if errorlevel 1 goto 2012loopSBU
 GOTO RUNSTEP2012
 
 :2012STEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -824,22 +665,20 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto 2012loopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP2012
 
 :2012STEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Disk Cleanup..........Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
@@ -850,51 +689,19 @@ if errorlevel 1 goto 2012loopDC
 GOTO RUNSTEP2012
 
 :2012STEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEP2012
 
 :2012STEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :2012loopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto 2012loopES
@@ -910,46 +717,12 @@ REM ____________________________________________________________________________
 echo Windows 8/8.1 Identified 
 :RUNSTEP8
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows 8 and 8.1
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set staging8=%%B
@@ -967,7 +740,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %staging8% == 11 (GOTO COMPLETE)
 
 :8STEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -991,9 +763,6 @@ PAUSE
 GOTO RUNSTEP8
 
 :8STEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -1004,11 +773,6 @@ if errorlevel 1 goto 8loopRE
 GOTO RUNSTEP8
 
 :8STEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -1108,19 +872,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :8STEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEP8
 
 :8STEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -1136,15 +893,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEP8
 
 :8STEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -1162,17 +910,6 @@ if errorlevel 1 goto 8loopSBU
 GOTO RUNSTEP8
 
 :8STEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -1181,78 +918,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto 8loopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP8
 
 :8STEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP8
 
 :8STEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEP8
 
 :8STEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :8loopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto 8loopES
@@ -1268,46 +981,12 @@ REM ____________________________________________________________________________
 echo Windows 7 Identified 
 :RUNSTEP7
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows 7
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set staging7=%%B
@@ -1325,7 +1004,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %staging7% == 11 (GOTO COMPLETE)
 
 :7STEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -1349,9 +1027,6 @@ PAUSE
 GOTO RUNSTEP7
 
 :7STEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -1362,11 +1037,6 @@ if errorlevel 1 goto 7loopRE
 GOTO RUNSTEP7
 
 :7STEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -1466,19 +1136,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :7STEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEP7
 
 :7STEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -1494,15 +1157,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEP7
 
 :7STEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -1520,17 +1174,6 @@ if errorlevel 1 goto 7loopSBU
 GOTO RUNSTEP7
 
 :7STEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -1539,78 +1182,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto 7loopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP7
 
 :7STEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP7
 
 :7STEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEP7
 
 :7STEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :7loopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto 7loopES
@@ -1626,46 +1245,12 @@ REM ____________________________________________________________________________
 echo Windows Server 2008 Identified 
 :RUNSTEP2008
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows Server 2008
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set staging2008=%%B
@@ -1683,7 +1268,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %staging2008% == 11 (GOTO COMPLETE)
 
 :2008STEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -1707,9 +1291,6 @@ PAUSE
 GOTO RUNSTEP2008
 
 :2008STEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -1720,11 +1301,6 @@ if errorlevel 1 goto 2008loopRE
 GOTO RUNSTEP2008
 
 :2008STEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -1824,19 +1400,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :2008STEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEP2008
 
 :2008STEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -1852,15 +1421,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEP2008
 
 :2008STEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -1878,17 +1438,6 @@ if errorlevel 1 goto 2008loopSBU
 GOTO RUNSTEP2008
 
 :2008STEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -1897,78 +1446,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto 2008loopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP2008
 
 :2008STEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP2008
 
 :2008STEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEP2008
 
 :2008STEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :2008loopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto 2008loopES
@@ -1984,46 +1509,12 @@ REM ____________________________________________________________________________
 echo Windows Vista Identified 
 :RUNSTEPVISTA
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows Vista
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set stagingVista=%%B
@@ -2041,7 +1532,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %stagingVista% == 11 (GOTO COMPLETE)
 
 :VISTASTEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -2065,9 +1555,6 @@ PAUSE
 GOTO RUNSTEPVISTA
 
 :VISTASTEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -2078,11 +1565,6 @@ if errorlevel 1 goto VistaloopRE
 GOTO RUNSTEPVISTA
 
 :VISTASTEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -2182,19 +1664,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :VISTASTEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEPVISTA
 
 :VISTASTEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -2210,15 +1685,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEPVISTA
 
 :VISTASTEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -2236,17 +1702,6 @@ if errorlevel 1 goto VistaloopSBU
 GOTO RUNSTEPVISTA
 
 :VISTASTEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -2255,78 +1710,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto VistaloopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEPVISTA
 
 :VISTASTEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEPVISTA
 
 :VISTASTEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEPVISTA
 
 :VISTASTEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :VistaloopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto VistaloopES
@@ -2342,46 +1773,12 @@ REM ____________________________________________________________________________
 echo Windows Server 2003 Identified 
 :RUNSTEP2003
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows Server 2003
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set staging2003=%%B
@@ -2399,7 +1796,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %staging2003% == 11 (GOTO COMPLETE)
 
 :2003STEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -2423,9 +1819,6 @@ PAUSE
 GOTO RUNSTEP2003
 
 :2003STEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -2436,11 +1829,6 @@ if errorlevel 1 goto 2003loopRE
 GOTO RUNSTEP2003
 
 :2003STEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -2540,19 +1928,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :2003STEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEP2003
 
 :2003STEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -2568,15 +1949,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEP2003
 
 :2003STEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -2594,17 +1966,6 @@ if errorlevel 1 goto 2003loopSBU
 GOTO RUNSTEP2003
 
 :2003STEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -2613,78 +1974,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto 2003loopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP2003
 
 :2003STEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP2003
 
 :2003STEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEP2003
 
 :2003STEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :2003loopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto 2003loopES
@@ -2700,46 +2037,12 @@ REM ____________________________________________________________________________
 echo Windows XP Identified 
 :RUNSTEPXP
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows XP
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set stagingXP=%%B
@@ -2757,7 +2060,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %stagingXP% == 11 (GOTO COMPLETE)
 
 :XPSTEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -2781,9 +2083,6 @@ PAUSE
 GOTO RUNSTEPXP
 
 :XPSTEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -2794,11 +2093,6 @@ if errorlevel 1 goto XPloopRE
 GOTO RUNSTEPXP
 
 :XPSTEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -2898,19 +2192,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :XPSTEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEPXP
 
 :XPSTEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -2926,15 +2213,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEPXP
 
 :XPSTEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -2952,17 +2230,6 @@ if errorlevel 1 goto XPloopSBU
 GOTO RUNSTEPXP
 
 :XPSTEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -2971,78 +2238,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto XPloopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEPXP
 
 :XPSTEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEPXP
 
 :XPSTEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEPXP
 
 :XPSTEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :XPloopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto XPloopES
@@ -3058,46 +2301,12 @@ REM ____________________________________________________________________________
 echo Windows 2000 Identified 
 :RUNSTEP2000
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows 2000
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set staging2000=%%B
@@ -3115,7 +2324,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %staging2000% == 11 (GOTO COMPLETE)
 
 :2000STEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -3139,9 +2347,6 @@ PAUSE
 GOTO RUNSTEP2000
 
 :2000STEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -3152,11 +2357,6 @@ if errorlevel 1 goto 2000loopRE
 GOTO RUNSTEP2000
 
 :2000STEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -3256,19 +2456,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :2000STEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEP2000
 
 :2000STEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -3284,15 +2477,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEP2000
 
 :2000STEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -3310,17 +2494,6 @@ if errorlevel 1 goto 2000loopSBU
 GOTO RUNSTEP2000
 
 :2000STEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -3329,78 +2502,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto 2000loopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP2000
 
 :2000STEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEP2000
 
 :2000STEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEP2000
 
 :2000STEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :2000loopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto 2000loopES
@@ -3416,46 +2565,12 @@ REM ____________________________________________________________________________
 echo Windows NT Identified 
 :RUNSTEPNT
 CLS
-ECHO                     .                                     
-ECHO                 ;   G                                     
-ECHO                 ;KtGG                                     
-ECHO              ,;,,ELjj                                     
-ECHO               ,fED.jLi,                                   
-ECHO                 jG.LfLjf                                  
-ECHO                jftDt tLjf                                 
-ECHO                   E;  .Lff                                
-ECHO                   ;    GjLjGG                             
-ECHO                      iD, .;f#GLft;                        
-ECHO                      jWLK##########Dt                     
-ECHO                      L###############Wj                   
-ECHO                    iK##################E,                 
-ECHO         tGDDf,    j#####################W,                
-ECHO       .Di .tKW;  t#######################K.               
-ECHO       L,iGGi.WE .W###############ELK######G               
-ECHO       G G  D L#.f###############G  .W##j;W#,              
-ECHO       iLiftG j#;K###############,   j#W  L#j              
-ECHO        tf.,  j#L###############W    ;#E  j#G              
-ECHO         D    f#################K    ,#E  f#G              
-ECHO         D    j#G################    i##. D#L              
-ECHO        ;f ;i .WKD###############j   D##EL##t              
-ECHO        G jjiD L#L###############Wt,L######W               
-ECHO        D L. D j#;E########################j,fDDDL;        
-ECHO        jt.LLt DK .W######################DjEi   ,Dj       
-ECHO         tLi,iDD,  ,K#####################Kf      ;E       
-ECHO           ,i;.   ;iL#####################f     .fD;       
-ECHO                 GGtfW#W#############WW##L    ,LEi         
-ECHO                 W,  .DL;jDW######KGt .WG   ;DEt           
-ECHO                 Df    LG    ,,,,      W  tEEt             
-ECHO                 tK     GL             LDDL;               
-ECHO                  W;     E;                                
-ECHO                  LL     jf                                
-ECHO                  ,W;    Gj                                
-ECHO                   ,GDDEKj                                 
-ECHO :
-ECHO :
-ECHO AV 3.3 Auto-Clean for Windows NT
-ECHO :
-ECHO :
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
 Set Reg.Key=HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean
 Set Reg.Val=Step
 For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Reg.Val%"' ) Do Call Set stagingNT=%%B
@@ -3473,7 +2588,6 @@ For /F "Tokens=2*" %%A In ('Reg Query "%Reg.Key%" /v "%Reg.Val%" ^| Find /I "%Re
     if %stagingNT% == 11 (GOTO COMPLETE)
 
 :NTSTEP1
-CD\AV3.3
 ECHO Getting Ready to check HD...............Step 1 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "2" /f
@@ -3497,9 +2611,6 @@ PAUSE
 GOTO RUNSTEPNT
 
 :NTSTEP2
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Revo..................Step 2 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "3" /f
@@ -3510,11 +2621,6 @@ if errorlevel 1 goto NTloopRE
 GOTO RUNSTEPNT
 
 :NTSTEP3
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "4" /f
@@ -3614,19 +2720,12 @@ bitsadmin.exe /reset /allusers
 wuauclt /resetauthorization /detectnow 
  
 :NTSTEP3.5 
-ECHO .
+ECHO.
 ECHO Windows Update Cache Reset!!!
 PAUSE
 GOTO RUNSTEPNT
 
 :NTSTEP4
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for CCleaner..............Step 4 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "5" /f
@@ -3642,15 +2741,6 @@ DEL %Public%\Desktop\CCleaner.lnk
 GOTO RUNSTEPNT
 
 :NTSTEP5
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Spybot................Step 5 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "6" /f
@@ -3668,17 +2758,6 @@ if errorlevel 1 goto NTloopSBU
 GOTO RUNSTEPNT
 
 :NTSTEP6
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "7" /f
@@ -3687,78 +2766,54 @@ AD\AD.EXE
 tasklist /fi "imagename eq AD.exe" |find ":" > nul
 if errorlevel 1 goto NTloopAD
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEPNT
 
 :NTSTEP7
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Combofix..............Step 7 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "8" /f
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /v "AutoClean" /t REG_SZ /d "C:\AV3.3\AUTOCLEAN.EXE" /f
 CF\CF.exe
 PAUSE
-ECHO Rebooting...
 SHUTDOWN /R
+CLS
+TYPE ETC\logo.dat
+ECHO.
+ECHO.
+ECHO %winvers%
+ECHO.
+ECHO.
+ECHO A reboot is required for this part of the cleaning process.  A 30 second timer to automatically restart
+ECHO the system has just begun.  Press (a) to abort the restart and continue on to the next step
+CHOICE /c ax /t 35 /d x >nul
+IF %errorlevel% == 1 SHUTDOWN /a
 GOTO RUNSTEPNT
 
 :NTSTEP8
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Malwarebytes..........Step 8 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "9" /f
 MA\MA.exe /verysilent
-IF EXIST C:\Progra~1\malwar~1\mbam.exe start C:\Progra~1\malwar~1\mbam.exe
-IF EXIST C:\Progra~2\malwar~1\mbam.exe start C:\Progra~2\malwar~1\mbam.exe
+IF EXIST C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~1\Malwarebytes\Anti-Malware\mbam.exe
+IF EXIST C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe C:\Progra~2\Malwarebytes\Anti-Malware\mbam.exe
 GOTO RUNSTEPNT
 
 :NTSTEP9
-CD\AV3.3
-ECHO Getting Ready to check HD...............Step 1 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Revo..................Step 2 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Junk File Cleanup.....Step 3 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for CCleaner..............Step 4 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Spybot................Step 5 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for ADW Cleaner...........Step 6 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Combofix..............Step 7 of 9
-ECHO Press any key to continue . . .
-ECHO Getting Ready for Malwarebytes..........Step 8 of 9
-ECHO Press any key to continue . . .
 ECHO Getting Ready for Eset Security Scan....Step 9 of 9
 PAUSE
 REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "10" /f
-ES\ES.exe
+ES\ES.EXE /exclude=av3.3
 :NTloopES
 tasklist /fi "imagename eq ES.exe" |find ":" > nul
 if errorlevel 1 goto NTloopES
@@ -3766,12 +2821,16 @@ REG ADD HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /v "Step" /t REG_SZ /d "1
 REG DELETE HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /va /f
 GOTO RUNSTEPNT
 
-:warn
-echo Windows Version Unknown
-echo :
-echo To prevent system damage the cleaning will halt.
-echo : 
-
+:WARN
+ECHO          !!Windows Version Unknown!!
+ECHO.
+ECHO To prevent system damage the cleaning will abort
+ECHO. 
+REG DELETE HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce /va /f
+REG DELETE HKEY_CURRENT_USER\SOFTWARE\Microsoft\Autoclean /va /f
+ECHO.
+PAUSE
+EXIT
 
 :COMPLETE
 CLS
@@ -3785,57 +2844,94 @@ ECHO.
 PAUSE
 EXIT
 
+:NOUSERF
+CLS
+ECHO.
+ECHO BACKUP ABORTED!! System Backup cannot be completed automatically!  This machine 
+ECHO will have to be backed up manually...
+ECHO.
+ECHO Error 11 - C:\Users - Folder Not Present
+ECHO.
+ECHO.
+PAUSE
+GOTO OPTIONS
+
+
 :BACKUP
-CD\AV3.3
 CLS
 ECHO System Backup Initializing...
+ETC\setup.exe /passive
+IF EXIST C:\Users (
+TIMEOUT /T 7 /NOBREAK >nul
+) else (
+GOTO NOUSERF
+)
+:BSTEP1
+SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Rich Tools\RichCopy 4.0;C:\Program Files\Microsoft Rich Tools\RichCopy 4.0
 ECHO.
 ECHO.
-ECHO.
-FOR /F "usebackq tokens=1,2 delims==" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' set ldt=%%j
+FOR /F "usebackq tokens=1,2 delims==" %%i in (`wmic os get LocalDateTime /VALUE 2^>NUL`) do if '.%%i.'=='.LocalDateTime.' SET ldt=%%j
 SET ldt=%ldt:~0,4%-%ldt:~4,2%-%ldt:~6,2%
-SET /P "backupdest=Please enter the destination of the backup.......(e.g. d: -- \\rackstation) : "
-SET /P "name=Please Name this Backup.................................(Usually Last Name) : "
+SET /P "backupdest=Please enter the destination of the backup......(e.g. \\rackstation\public) : "
+SET /P "name=Please Name this Backup.........................................(No Spaces) : "
 ECHO.
-ECHO Attempting to retrieve and back up Product Key(s)..
-INFO\GetKey.exe /s raw.txt
-FINDSTR /i /c:"Micro" /c:"Comp" /c:"Owne" /c:"PID:" /c:"Key:" INFO\raw.txt >INFO\keyinfo.txt
+ECHO Backing up Product Key(s)..
+CD\AV3.3\INFO
+GetKey.exe /s keyinfo.txt
+CD\AV3.3
 XCOPY INFO\keyinfo.txt %backupdest%\%name%-%ldt%\ /C /Y /Z /Q
 DEL INFO\keyinfo.txt /Q
-DEL INFO\raw.txt /Q
 ECHO.
-ECHO Attempting to retrieve and back up Outlook PST files (from default locations)
+IF EXIST %AppData%\Microsoft\Windows\Themes\TranscodedWallpaper (
+ECHO Backing up Wallpaper... 
+COPY %AppData%\Microsoft\Windows\Themes\TranscodedWallpaper %backupdest%\%name%-%ldt%\Wallpaper.jpg /Y /Z >nul
+ECHO 1 File^(s^) copied
+ECHO.
+) else (
+GOTO BSTEP1.5
+)
+:BSTEP1.5
+IF EXIST %AppData%\Local\Microsoft\Windows\Themes\Wallpaper1.bmp (
+ECHO Backing up Wallpaper... 
+XCOPY %AppData%\Local\Microsoft\Windows\Themes\Wallpaper1.bmp %backupdest%\%name%-%ldt%\Wallpaper.bmp /C /Y /Z /Q
+ECHO.
+) else (
+GOTO BSTEP1.75
+)
+:BSTEP1.75
 IF EXIST %userprofile%\AppData\Local\Microsoft\Outlook\*.pst (
+ECHO Outlook 2007-2010 PST files detected. Backing up... 
 XCOPY %userprofile%\AppData\Local\Microsoft\Outlook\*.pst %backupdest%\%name%-%ldt%\Outlook-PST\ /C /Y /Z /Q
 ECHO.
-) ELSE (
+) else (
 GOTO BSTEP2
 )
 :BSTEP2
 IF EXIST %userprofile%\Documents\Outloo~1\*.pst (
+ECHO Outlook 2013-2016 PST files detected. Backing up... 
 XCOPY %userprofile%\Documents\Outloo~1\*.pst %backupdest%\%name%-%ldt%\Outlook-PST\ /C /Y /Z /Q
 ECHO.
-) ELSE (
+) else (
 GOTO BSTEP3
 )
 :BSTEP3
-ECHO Attempting to retrieve and back up Quickbooks Data...
 IF EXIST C:\Users\Public\Docume~1\Intuit\QuickB~1\Compan~1\*.* (
+ECHO Quickbooks data files detected.  Backing up... 
 XCOPY C:\Users\Public\Docume~1\Intuit\QuickB~1\Compan~1\*.* %backupdest%\%name%-%ldt%\QuickBooks-Data\ /E /C /Y /Z /Q
 ECHO.
-) ELSE (
+) else (
 GOTO BSTEP4
 )
 :BSTEP4
-ECHO Attempting to retrieve and back up the Registry..
+ECHO Backing up the Registry...
 REG EXPORT hkey_local_machine\software\microsoft\windows INFO\HKLMregbackup_%ldt%.reg /Y
 REG EXPORT hkey_current_user\software\microsoft\windows INFO\HKCUregbackup_%ldt%.reg /Y
-XCOPY INFO\HKLMregbackup_%ldt%.reg %backupdest%\%name%-%ldt%\ /C /Y /Z /Q
-XCOPY INFO\HKCUregbackup_%ldt%.reg %backupdest%\%name%-%ldt%\ /C /Y /Z /Q
+XCOPY INFO\HKLMregbackup_%ldt%.reg %backupdest%\%name%-%ldt%\RegistryBackup\ /C /Y /Z /Q
+XCOPY INFO\HKCUregbackup_%ldt%.reg %backupdest%\%name%-%ldt%\RegistryBackup\ /C /Y /Z /Q
 ECHO.
-ECHO Backing up User Data. This may take a while..
-XCOPY "C:\Users\*.*" "%backupdest%\%name%-%ldt%\Users\" /E /C /H /Y /Z 
-ECHO Backup Complete..
+ECHO Backing up User Data. This may take a while...
+RICHCOPY C:\Users\ %backupdest%\%name%-%ldt%\Users\ /ALWS /CNF /FED "AppData;Application Data"
+ECHO Backup Complete...
 ECHO.
 PAUSE
 GOTO OPTIONS
